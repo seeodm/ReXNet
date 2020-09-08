@@ -28,7 +28,7 @@ class Trainer(object):
         if self.spec.distributed:
             torch.cuda.set_device(rank)
             dist.init_process_group(backend='nccl',
-                                    init_method='tcp://127.0.0.1:8000',
+                                    init_method='tcp://127.0.0.1:8001',
                                     world_size=self.spec.gpus,
                                     rank=rank)
 
