@@ -15,7 +15,7 @@ from typing import Tuple, Dict, Iterator
 class RexnetTrainingSpec(TrainingSpec):
     def __init__(self, train_data: str, valid_data: str, train_batch_size: int,
                 train_shuffle: bool, valid_batch_size: int, valid_shuffle: bool, num_workers: int,
-                base_lr: float, lr_min: float, lr_decay: float, warmpup_lr_init: float,
+                base_lr: float, lr_min: float, lr_decay: float, warmup_lr_init: float,
                 warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, epochs: int,
                 model_save_path: str, ):
         self.train_data = train_data
@@ -31,7 +31,7 @@ class RexnetTrainingSpec(TrainingSpec):
         self.lr_min = lr_min
         self.lr_decay = lr_decay
 
-        self.warmup_lr_init = warmpup_lr_init
+        self.warmup_lr_init = warmup_lr_init
         self.warmpup_t = warmup_t
 
         self.cooldown_epochs = cooldown_epochs
