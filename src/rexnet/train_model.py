@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from rexnet.data import AffectNetDataset
 from rexnet.model import ReXNetV1
-from rexnet.train import TrainingSpec
+from rexnet.train import TrainingSpec, Trainer
 from rexnet.utils import CosineLRScheduler
 
 from typing import Tuple, Dict, Iterator
