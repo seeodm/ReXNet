@@ -18,7 +18,8 @@ class RexnetTrainingSpec(TrainingSpec):
                 base_lr: float, lr_min: float, lr_decay: float, warmup_lr_init: float,
                 warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, 
                 epochs: int, save_epochs: int, eval_epochs: int,
-                model_save_path: str, checkpoint_path: str):
+                model_save_path: str, checkpoint_path: str,
+                gpus: int):
         self.train_data = train_data
         self.valid_data = valid_data
 
@@ -46,6 +47,9 @@ class RexnetTrainingSpec(TrainingSpec):
 
         self.model_save_path = model_save_path
         self.checkpoint_path = checkpoint_path
+
+        self.gpus = gpus
+        self.distributed = True if self.gpus is not None else False
 
     def init(self):
         self.criterion = nn.CrossEntropyLoss()
@@ -141,7 +145,8 @@ def train_rexnet(args: argparse.Namespace):
                             warmup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
                             momentum=args.momentum, nesterov=args.nesterov, 
                             epochs=args.epochs, save_epochs=args.save_epochs, eval_epochs=args.eval_epochs,
-                            model_save_path=args.model_save_path, checkpoint_path=args.checkpoint_path)
+                            model_save_path=args.model_save_path, checkpoint_path=args.checkpoint_path,
+                            gpus=args.gpus)
     
     Trainer(spec).train()
 
@@ -177,5 +182,8 @@ def add_subparser(subparsers):
     group = parser.add_argument_group('Saving Config')
     group.add_argument('--model_save_path', default='./model.pth', help='model save path')
     group.add_argument('--checkpoint_path', default='./checkpoint.pth', help='checkpoint save path')
+
+    group = parser.add_argument_group('Others')
+    group.add_argument('--gpus', default=None, type=int, help='number of gpu devices')
 
     parser.set_defaults(func=train_rexnet)

@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.multiprocessing as mp
+import torch.distributed as dist
 from torch.utils.data import DataLoader
 
 from rexnet.train import TrainingSpec, Recorder
@@ -15,6 +17,21 @@ class Trainer(object):
         self.spec = spec
 
     def train(self):
+        if self.spec.distributed:
+            mp.spawn(self._train, nprocs=self.spec.gpus)
+        else:
+            self._train(0)
+
+    def _train(self,
+            rank: int):
+
+        if self.spec.distributed:
+            torch.cuda.set_device(rank)
+            dist.init_process_group(backend='nccl',
+                                    init_method='tcp://127.0.0.1:8000',
+                                    world_size=self.spec.gpus,
+                                    rank=rank)
+
         self.spec.init()
 
         model = self.spec.construct_model().cuda()
@@ -24,19 +41,24 @@ class Trainer(object):
         optimizer = self.spec.create_optimizer(model.parameters())
         scheduler, epochs = self.spec.create_scheduler(optimizer)
 
+        if self.spec.distributed:
+            model = nn.parallel.DistributedDataParallel(
+                model, device_ids=[rank]
+            )
+
         recorder = Recorder()
 
         t = tqdm.tqdm(total=epochs * len(train_loader))
 
         for epoch in range(epochs):
             train_metrics = self._train_step(epoch, model, train_loader, optimizer, t)
-            recorder.record(epoch, train_metrics)
+            recorder.record(epoch, train_metrics, phase='train')
 
             if (epoch + 1) % self.spec.eval_epochs:
                 eval_metrics = self._valid_step(epoch, model, valid_loader, optimizer, t)
                 recorder.record(epoch, eval_metrics, phase='eval')
 
-            if (epoch + 1) % self.spec.save_epochs:
+            if rank == 0 and (epoch + 1) % self.spec.save_epochs:
                 ckpt = {
                     'epoch' : epoch,
                     'recorder' : recorder,
@@ -49,7 +71,8 @@ class Trainer(object):
                 del ckpt
 
         # Model save
-        torch.save(model.cpu().state_dict(), self.spec.model_save_path)
+        if rank == 0:
+            torch.save(model.cpu().state_dict(), self.spec.model_save_path)
 
     def _train_step(self, 
                     epochs: int,
