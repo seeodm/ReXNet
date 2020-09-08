@@ -137,6 +137,7 @@ def train_rexnet(args: argparse.Namespace):
                             warmup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
                             momentum=args.momentum, nesterov=args.nesterov, epochs=args.epochs, model_save_path=args.model_save_path)
     
+    Trainer(spec).train()
 
 def add_subparser(subparsers):
     parser = subparsers.add_parser('train', help='train ReXNet')
