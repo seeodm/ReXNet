@@ -10,14 +10,15 @@ from rexnet.model import ReXNetV1
 from rexnet.train import TrainingSpec, Trainer
 from rexnet.utils import CosineLRScheduler
 
-from typing import Tuple, Dict, Iterator
+from typing import Tuple, Dict, Iterator, Any
 
 class RexnetTrainingSpec(TrainingSpec):
     def __init__(self, train_data: str, valid_data: str, train_batch_size: int,
                 train_shuffle: bool, valid_batch_size: int, valid_shuffle: bool, num_workers: int,
                 base_lr: float, lr_min: float, lr_decay: float, warmup_lr_init: float,
-                warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, epochs: int,
-                model_save_path: str, ):
+                warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, 
+                epochs: int, save_epochs: int, eval_epochs: int,
+                model_save_path: str, checkpoint_path: str):
         self.train_data = train_data
         self.valid_data = valid_data
 
@@ -40,8 +41,11 @@ class RexnetTrainingSpec(TrainingSpec):
         self.nesterov = nesterov
 
         self.epochs = epochs
+        self.save_epochs = save_epochs
+        self.eval_epochs = eval_epochs
 
         self.model_save_path = model_save_path
+        self.checkpoint_path = checkpoint_path
 
     def init(self):
         self.criterion = nn.CrossEntropyLoss()
@@ -117,17 +121,17 @@ class RexnetTrainingSpec(TrainingSpec):
         
         return scheduler, total_epochs
 
-    def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> torch.Tensor:
+    def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         output = model(pixel)
         loss = self.criterion(output, label)
 
-        return loss
+        return {'output': output, 'loss': loss}
 
-    def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> torch.Tensor:
+    def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         output = model(pixel)
         loss = self.criterion(output, label)
 
-        return loss    
+        return {'ouptut': output, 'loss': loss}    
 
 def train_rexnet(args: argparse.Namespace):
     spec = RexnetTrainingSpec(train_data=args.train_data, valid_data=args.valid_data,
@@ -135,7 +139,9 @@ def train_rexnet(args: argparse.Namespace):
                             valid_batch_size=args.valid_batch_size, valid_shuffle=args.valid_shuffle,
                             num_workers=args.num_workers, base_lr=args.base_lr, lr_min=args.lr_min, lr_decay=args.lr_decay,
                             warmup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
-                            momentum=args.momentum, nesterov=args.nesterov, epochs=args.epochs, model_save_path=args.model_save_path)
+                            momentum=args.momentum, nesterov=args.nesterov, 
+                            epochs=args.epochs, save_epochs=args.save_epochs, eval_epochs=args.eval_epochs,
+                            model_save_path=args.model_save_path, checkpoint_path=args.checkpoint_path)
     
     Trainer(spec).train()
 
@@ -154,7 +160,9 @@ def add_subparser(subparsers):
     group.add_argument('--num_workers', default=4, type=int, help='number of workers for data load')
 
     group = parser.add_argument_group('Train Config')
-    group.add_argument('--epochs', default=400, type=int, help='num of epochs')
+    group.add_argument('--epochs', default=400, type=int, help='num of total epochs')
+    group.add_argument('--save_epochs', default=10, type=int, help='interval epohcs of saving')
+    group.add_argument('--eval_epochs', default=1, type=int, help='interval epochs of eval')
     group.add_argument('--base_lr', default=0.5, type=float, help='base lr value')
     group.add_argument('--lr_min', default=0.00001, type=float, help='minimum value of lr')
     group.add_argument('--lr_decay', default=0.1, type=float, help='lr decay value')
@@ -168,5 +176,6 @@ def add_subparser(subparsers):
 
     group = parser.add_argument_group('Saving Config')
     group.add_argument('--model_save_path', default='./model.pth', help='model save path')
+    group.add_argument('--checkpoint_path', default='./checkpoint.pth', help='checkpoint save path')
 
     parser.set_defaults(func=train_rexnet)

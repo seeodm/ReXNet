@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from rexnet.data import AffectNetDataset
 from rexnet.utils import CosineLRScheduler
 
-from typing import Tuple, Dict, Iterator
+from typing import Tuple, Dict, Iterator, Any
 
 class TrainingSpec(object):
     def init(self):
@@ -29,8 +29,8 @@ class TrainingSpec(object):
     def create_scheduler(self, optimizer: optim.Optimizer) -> Tuple[CosineLRScheduler, int]:
         raise NotImplementedError()
 
-    def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> torch.Tensor:
+    def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         raise NotImplementedError()
        
-    def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> torch.Tensor:
+    def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         raise NotImplementedError()
