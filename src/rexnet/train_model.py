@@ -74,7 +74,7 @@ class RexnetTrainingSpec(TrainingSpec):
                                         phase='train')
         valid_dataset = AffectNetDataset(path=self.valid_data,
                                         transform=valid_transformer,
-                                        phase='valid')
+                                        phase='validation')
 
         train_loader = DataLoader(train_dataset, 
                                 batch_size=self.train_batch_size,
