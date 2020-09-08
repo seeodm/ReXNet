@@ -134,7 +134,7 @@ def train_rexnet(args: argparse.Namespace):
                             train_batch_size=args.train_batch_size, train_shuffle=args.train_shuffle,
                             valid_batch_size=args.valid_batch_size, valid_shuffle=args.valid_shuffle,
                             num_workers=args.num_workers, base_lr=args.base_lr, lr_min=args.lr_min, lr_decay=args.lr_decay,
-                            warmpup_lr_init=args.warmpup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
+                            warmpup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
                             momentum=args.momentum, nesterov=args.nesterov, epochs=args.epochs)
     
 
