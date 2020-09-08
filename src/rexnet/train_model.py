@@ -104,7 +104,7 @@ class RexnetTrainingSpec(TrainingSpec):
             lr_min=self.lr_min,
             decay_rate=self.lr_decay,
             warmup_lr_init=self.warmup_lr_init,
-            warmup_t=self.warmpup_t,
+            warmup_t=self.warmup_t,
             cycle_limit=1,
             t_in_epochs=True,
             noise_range_t=None,
@@ -134,7 +134,7 @@ def train_rexnet(args: argparse.Namespace):
                             train_batch_size=args.train_batch_size, train_shuffle=args.train_shuffle,
                             valid_batch_size=args.valid_batch_size, valid_shuffle=args.valid_shuffle,
                             num_workers=args.num_workers, base_lr=args.base_lr, lr_min=args.lr_min, lr_decay=args.lr_decay,
-                            warmpup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
+                            warmup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
                             momentum=args.momentum, nesterov=args.nesterov, epochs=args.epochs)
     
 
