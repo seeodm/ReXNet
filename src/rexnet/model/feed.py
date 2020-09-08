@@ -2,8 +2,7 @@ import torch
 import torch.nn as nn
 from math import ceil
 
-from rexnet.model import (Swish, _add_conv_swish, _add_conv,
-                          SE, LinearBottleneck)
+from rexnet.model import Swish, SE, LinearBottleneck, _add_conv_swish, _add_conv
 
 class ReXNetV1(nn.Module):
     def __init__(self, 

@@ -49,7 +49,7 @@ class RexnetTrainingSpec(TrainingSpec):
     def construct_model(self):
         return ReXNetV1()
 
-    def prepare_transform(self) -> Tuple[transforms, transforms]:
+    def prepare_transform(self) -> Tuple[transforms.Compose, transforms.Compose]:
         train_transformer = transforms.Compose([
             transforms.ToPILImage(),
             transforms.RandomResizedCrop((224, 224), scale=(0.08, 1.0)),
@@ -143,7 +143,7 @@ def add_subparser(subparsers):
 
     group = parser.add_argument_group('Dataset')
     group.add_argument('--train_data', required=True, help='affectnet train data file path')
-    group.add_argument('--valid_data', require=True, help='affectnet valid data file path')
+    group.add_argument('--valid_data', required=True, help='affectnet valid data file path')
 
     group = parser.add_argument_group('Dataset Config')
     group.add_argument('--train_batch_size', default=256, type=int, help='train batch size')

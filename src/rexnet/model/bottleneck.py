@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from rexnet.model import _add_conv_swish, _add_conv
+
 class SE(nn.Module):
     def __init__(self, in_channels, channels, se_ratio=12):
         super(SE, self).__init__()

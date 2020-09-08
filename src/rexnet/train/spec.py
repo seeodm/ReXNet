@@ -13,7 +13,7 @@ class TrainingSpec(object):
     def init(self):
         pass
     
-    def prepare_transform(self) -> Tuple[transforms, transforms]:
+    def prepare_transform(self) -> Tuple[transforms.Compose, transforms.Compose]:
         raise NotImplementedError()
 
     def prepare_dataloader(self) -> Tuple[DataLoader, DataLoader]:

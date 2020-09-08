@@ -8,7 +8,7 @@ from rexnet.utils import CosineLRScheduler
 
 import tqdm
 
-class Trainier(object):
+class Trainer(object):
     def __init__(self, spec: TrainingSpec):
         self.spec = spec
 
