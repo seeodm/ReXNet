@@ -22,9 +22,11 @@ class Trainer(object):
         optimizer = self.spec.create_optimizer(model.parameters())
         scheduler, epochs = self.spec.create_scheduler(optimizer)
 
-        for epoch in tqdm.tqdm(range(epochs)):
-            self._train_step(epoch, model, train_loader, optimizer)
-            self._valid_step(epoch, model, valid_loader, optimizer)
+        t = tqdm.tqdm(total=epochs * len(train_loader))
+
+        for epoch in range(epochs):
+            self._train_step(epoch, model, train_loader, optimizer, t)
+            self._valid_step(epoch, model, valid_loader, optimizer, t)
 
         torch.save(model.cpu().state_dict(), self.spec.model_save_path)
 
@@ -32,7 +34,8 @@ class Trainer(object):
                     epochs: int,
                     model: nn.Module,
                     data: DataLoader,
-                    optimizer: optim.Optimizer):
+                    optimizer: optim.Optimizer,
+                    t: tqdm.tqdm):
         
         model.train()
 
@@ -47,12 +50,15 @@ class Trainer(object):
             loss.backward()
             optimizer.step()
 
+            t.update(1)
+
     @torch.no_grad()
     def _valid_step(self,
                     epochs: int,
                     model: nn.Module,
                     data: DataLoader,
-                    optimizer: optim.Optimizer):
+                    optimizer: optim.Optimizer,
+                    t: tqdm.tqdm):
         model.eval()
 
         for idx, (pixel, label) in enumerate(data):
