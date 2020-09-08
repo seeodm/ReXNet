@@ -48,7 +48,8 @@ class Trainer(object):
 
         recorder = Recorder()
 
-        t = tqdm.tqdm(total=epochs * len(train_loader))
+        if rank == 0:
+            t = tqdm.tqdm(total=epochs * len(train_loader))
 
         for epoch in range(epochs):
             train_metrics = self._train_step(epoch, model, train_loader, optimizer, t)
