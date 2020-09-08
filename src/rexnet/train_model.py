@@ -32,7 +32,7 @@ class RexnetTrainingSpec(TrainingSpec):
         self.lr_decay = lr_decay
 
         self.warmup_lr_init = warmup_lr_init
-        self.warmpup_t = warmup_t
+        self.warmup_t = warmup_t
 
         self.cooldown_epochs = cooldown_epochs
 
