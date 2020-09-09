@@ -144,7 +144,11 @@ class RexnetTrainingSpec(TrainingSpec):
             loss = loss_nll * self.center_loss_lambda * loss_center
 
             center_delta = get_center_delta(feature, centers, label, alpha=self.center_loss_alpha)
-            model.centers = centers - center_delta
+
+            if self.distributed:
+                model.module.centers = centers - center_delta
+            else:
+                model.centers = centers - center_delta
         else:    
             output = model(pixel)
 
