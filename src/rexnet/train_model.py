@@ -141,7 +141,7 @@ class RexnetTrainingSpec(TrainingSpec):
             loss_nll = self.criterion(output, label)
             loss_center = compute_center_loss(feature, centers, label)
 
-            loss = loss_nll * self.center_loss_lambda * loss_center
+            loss = loss_nll + self.center_loss_lambda * loss_center
 
             center_delta = get_center_delta(feature, centers, label, alpha=self.center_loss_alpha)
         else:    
@@ -162,7 +162,7 @@ class RexnetTrainingSpec(TrainingSpec):
             loss_nll = self.criterion(output, label)
             loss_center = compute_center_loss(feature, centers, label)
 
-            loss = loss_nll * self.center_loss_lambda * loss_center
+            loss = loss_nll + self.center_loss_lambda * loss_center
         else:    
             output = model(pixel)
 
