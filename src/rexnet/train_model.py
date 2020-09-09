@@ -131,7 +131,7 @@ class RexnetTrainingSpec(TrainingSpec):
         return scheduler, total_epochs
 
     def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
-        if model.center_loss:
+        if self.center_loss:
             output, feature = model(pixel)
             centers = model.centers
 
@@ -150,7 +150,7 @@ class RexnetTrainingSpec(TrainingSpec):
         return {'output': output, 'loss': loss}
 
     def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
-        if model.center_loss:
+        if self.center_loss:
             output, feature = model(pixel)
             centers = model.centers
 
