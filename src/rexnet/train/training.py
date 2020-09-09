@@ -51,11 +51,11 @@ class Trainer(object):
         t = tqdm.tqdm(total=epochs * len(train_loader))
 
         for epoch in range(epochs):
-            train_metrics = self._train_step(epoch, model, train_loader, optimizer, t)
+            train_metrics = self._train_step(rank, epoch, model, train_loader, optimizer, t)
             recorder.record(epoch, train_metrics, phase='train')
 
             if (epoch + 1) % self.spec.eval_epochs:
-                eval_metrics = self._valid_step(epoch, model, valid_loader, optimizer, t)
+                eval_metrics = self._valid_step(rank, epoch, model, valid_loader, optimizer, t)
                 recorder.record(epoch, eval_metrics, phase='eval')
 
             if rank == 0 and (epoch + 1) % self.spec.save_epochs:
