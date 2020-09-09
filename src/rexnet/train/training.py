@@ -75,6 +75,7 @@ class Trainer(object):
             torch.save(model.cpu().state_dict(), self.spec.model_save_path)
 
     def _train_step(self, 
+                    rank: int,
                     epochs: int,
                     model: nn.Module,
                     data: DataLoader,
@@ -97,6 +98,13 @@ class Trainer(object):
 
             loss = metrics['loss']
             output = metrics['output']
+            center_delta = metrics['delta']
+
+            if rank == 0 :
+                if self.spec.distributed:
+                    model.module.centers -= center_delta
+                else:
+                    model.centers -= center_delta
 
             loss.backward(retain_graph=True)
             optimizer.step()
@@ -119,6 +127,7 @@ class Trainer(object):
 
     @torch.no_grad()
     def _valid_step(self,
+                    rank: int,
                     epochs: int,
                     model: nn.Module,
                     data: DataLoader,
