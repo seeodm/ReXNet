@@ -102,11 +102,11 @@ class Trainer(object):
 
             if rank == 0 :
                 if self.spec.distributed:
-                    model.module.centers -= center_delta
+                    model.module.centers.data -= center_delta
                 else:
-                    model.centers -= center_delta
+                    model.centers.data -= center_delta
 
-            loss.backward(retain_graph=True)
+            loss.backward()
             optimizer.step()
 
             t.update(1)

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.auto_grad import Variable
 from math import ceil
 
 from rexnet.model import Swish, SE, LinearBottleneck, _add_conv_swish, _add_conv
@@ -67,7 +68,8 @@ class ReXNetV1(nn.Module):
 
         self.center_loss = center_loss
         if self.center_loss:
-            self.register_buffer('centers', (torch.rand(classes, pen_channels).cuda() - 0.5) * 2)
+            #self.register_buffer('centers', (torch.rand(classes, pen_channels).cuda() - 0.5) * 2)
+            self.centers = Variable((torch.rand(classes, pen_channels).cuda() - 0.5) * 2, requires_grad=False)
 
     def forward(self, x):
         x = self.features(x)
