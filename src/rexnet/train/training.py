@@ -98,7 +98,7 @@ class Trainer(object):
             loss = metrics['loss']
             output = metrics['output']
 
-            loss.backward()
+            loss.backward(retain_graph=True)
             optimizer.step()
 
             t.update(1)
