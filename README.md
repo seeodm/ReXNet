@@ -1,8 +1,8 @@
-# Pytorch ReXNet Train Code
+# Pytorch ReXNet with center loss train code
 
 ## Introduce
 
-This project is Clova AI ReXNet train code.
+This project is Clova AI ReXNet with center loss train code.
 
 ## How to train?
 You have to prepare AffectNet Dataset. Data loader code is focused on AffectNet.
@@ -20,12 +20,22 @@ Here is link to download dataset. [Download](http://mohammadmahoor.com/affectnet
 
 The detail of command-line is as follows:
 
-        usage: rexnet train [-h] --train_data TRAIN_DATA --valid_data VALID_DATA [--train_batch_size TRAIN_BATCH_SIZE]
-                    [--valid_batch_size VALID_BATCH_SIZE] [--train_shuffle TRAIN_SHUFFLE] [--valid_shuffle VALID_SHUFFLE]
-                    [--num_workers NUM_WORKERS] [--epochs EPOCHS] [--save_epochs SAVE_EPOCHS] [--eval_epochs EVAL_EPOCHS]
-                    [--base_lr BASE_LR] [--lr_min LR_MIN] [--lr_decay LR_DECAY] [--warmup_lr_init WARMUP_LR_INIT]
-                    [--warmup_t WARMUP_T] [--cooldown_epochs COOLDOWN_EPOCHS] [--momentum MOMENTUM] [--nesterov NESTEROV]
-                    [--model_save_path MODEL_SAVE_PATH] [--checkpoint_path CHECKPOINT_PATH] [--gpus GPUS]
+        usage: rexnet train [-h] --train_data TRAIN_DATA --valid_data VALID_DATA
+                    [--train_batch_size TRAIN_BATCH_SIZE]
+                    [--valid_batch_size VALID_BATCH_SIZE]
+                    [--train_shuffle TRAIN_SHUFFLE]
+                    [--valid_shuffle VALID_SHUFFLE]
+                    [--num_workers NUM_WORKERS] [--epochs EPOCHS]
+                    [--save_epochs SAVE_EPOCHS] [--eval_epochs EVAL_EPOCHS]
+                    [--base_lr BASE_LR] [--lr_min LR_MIN]
+                    [--lr_decay LR_DECAY] [--warmup_lr_init WARMUP_LR_INIT]
+                    [--warmup_t WARMUP_T] [--cooldown_epochs COOLDOWN_EPOCHS]
+                    [--momentum MOMENTUM] [--nesterov NESTEROV]
+                    [--model_save_path MODEL_SAVE_PATH]
+                    [--checkpoint_path CHECKPOINT_PATH] [--gpus GPUS]
+                    [--center_loss CENTER_LOSS]
+                    [--center_loss_lambda CENTER_LOSS_LAMBDA]
+                    [--center_loss_alpha CENTER_LOSS_ALPHA]
 
         optional arguments:
         -h, --help            show this help message and exit
@@ -75,6 +85,12 @@ The detail of command-line is as follows:
 
         Others:
         --gpus GPUS           number of gpu devices
+        --center_loss CENTER_LOSS
+                                use center loss
+        --center_loss_lambda CENTER_LOSS_LAMBDA
+                                center loss lambda
+        --center_loss_alpha CENTER_LOSS_ALPHA
+                                center loss alpha
 
 ## Contact Info
 
