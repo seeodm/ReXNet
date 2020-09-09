@@ -98,13 +98,6 @@ class Trainer(object):
 
             loss = metrics['loss']
             output = metrics['output']
-            center_delta = metrics['delta']
-
-            if rank == 0 :
-                if self.spec.distributed:
-                    model.module.centers.data -= center_delta
-                else:
-                    model.centers.data -= center_delta
 
             loss.backward()
             optimizer.step()

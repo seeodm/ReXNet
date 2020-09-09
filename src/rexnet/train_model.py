@@ -144,12 +144,17 @@ class RexnetTrainingSpec(TrainingSpec):
             loss = loss_nll + self.center_loss_lambda * loss_center
 
             center_delta = get_center_delta(feature, centers, label, alpha=self.center_loss_alpha)
+
+            if self.distributed:
+                model.module.centers.data -= center_delta
+            else:
+                model.centers.data -= center_delta
         else:    
             output = model(pixel)
 
             loss = self.criterion(output, label)
 
-        return {'output': output, 'loss': loss, 'delta' : center_delta}
+        return {'output': output, 'loss': loss}
 
     def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         if self.center_loss:
