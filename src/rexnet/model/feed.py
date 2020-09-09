@@ -12,6 +12,7 @@ class ReXNetV1(nn.Module):
                  depth_mult: float=1.0, 
                  classes: int=4,
                  use_se: bool=True,
+                 center_loss: bool=True,
                  se_ratio: int=12,
                  dropout_ratio:float =0.2,
                  bn_momentum:float =0.9):
@@ -64,7 +65,16 @@ class ReXNetV1(nn.Module):
             nn.Dropout(dropout_ratio),
             nn.Conv2d(pen_channels, classes, 1, bias=True))
 
+        self.center_loss = center_loss
+        if self.center_loss:
+            self.register_buffer('centers', (torch.rand(classes, pen_channels).cuda() - 0.5) * 2)
+
     def forward(self, x):
         x = self.features(x)
-        x = self.output(x).squeeze()
-        return x
+        if self.center_loss:
+            t = x.squeeze()
+            x = self.output(x).squeeze()
+            return x, t
+        else:
+            x = self.output(x).squeeze()
+            return x

@@ -9,6 +9,7 @@ from rexnet.data import AffectNetDataset
 from rexnet.model import ReXNetV1
 from rexnet.train import TrainingSpec, Trainer
 from rexnet.utils import CosineLRScheduler
+from rexnet.loss import compute_center_loss, get_center_delta
 
 from typing import Tuple, Dict, Iterator, Any
 
@@ -19,7 +20,7 @@ class RexnetTrainingSpec(TrainingSpec):
                 warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, 
                 epochs: int, save_epochs: int, eval_epochs: int,
                 model_save_path: str, checkpoint_path: str,
-                gpus: int):
+                gpus: int, center_loss: bool, center_loss_lambda: float, center_loss_alpha: float):
         self.train_data = train_data
         self.valid_data = valid_data
 
@@ -51,11 +52,15 @@ class RexnetTrainingSpec(TrainingSpec):
         self.gpus = gpus
         self.distributed = True if self.gpus is not None else False
 
+        self.center_loss = center_loss
+        self.center_loss_lambda = center_loss_lambda
+        self.center_loss_alpha = center_loss_alpha
+
     def init(self):
         self.criterion = nn.CrossEntropyLoss()
 
     def construct_model(self):
-        return ReXNetV1()
+        return ReXNetV1(center_loss=self.center_loss)
 
     def prepare_transform(self) -> Tuple[transforms.Compose, transforms.Compose]:
         train_transformer = transforms.Compose([
@@ -126,16 +131,39 @@ class RexnetTrainingSpec(TrainingSpec):
         return scheduler, total_epochs
 
     def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
-        output = model(pixel)
-        loss = self.criterion(output, label)
+        if model.center_loss:
+            output, feature = model(pixel)
+            centers = model.centers
+
+            loss_nll = self.criterion(output, label)
+            loss_center = compute_center_loss(feature, centers, label)
+
+            loss = loss_nll * self.center_loss_lambda * loss_center
+
+            center_delta = get_center_delta(feature, centers, label, alpha=self.center_loss_alpha)
+            model.centers = centers - center_delta
+        else:    
+            output = model(pixel)
+
+            loss = self.criterion(output, label)
 
         return {'output': output, 'loss': loss}
 
     def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
-        output = model(pixel)
-        loss = self.criterion(output, label)
+        if model.center_loss:
+            output, feature = model(pixel)
+            centers = model.centers
 
-        return {'ouptut': output, 'loss': loss}    
+            loss_nll = self.criterion(output, label)
+            loss_center = compute_center_loss(feature, centers, label)
+
+            loss = loss_nll * self.center_loss_lambda * loss_center
+        else:    
+            output = model(pixel)
+
+            loss = self.criterion(output, label)
+
+        return {'output': output, 'loss': loss}   
 
 def train_rexnet(args: argparse.Namespace):
     spec = RexnetTrainingSpec(train_data=args.train_data, valid_data=args.valid_data,
@@ -146,7 +174,8 @@ def train_rexnet(args: argparse.Namespace):
                             momentum=args.momentum, nesterov=args.nesterov, 
                             epochs=args.epochs, save_epochs=args.save_epochs, eval_epochs=args.eval_epochs,
                             model_save_path=args.model_save_path, checkpoint_path=args.checkpoint_path,
-                            gpus=args.gpus)
+                            gpus=args.gpus, center_loss=args.center_loss, center_loss_lambda=args.center_loss_lambda,
+                            center_loss_alpha=args.center_loss_alpha)
     
     Trainer(spec).train()
 
@@ -185,5 +214,8 @@ def add_subparser(subparsers):
 
     group = parser.add_argument_group('Others')
     group.add_argument('--gpus', default=None, type=int, help='number of gpu devices')
+    group.add_argument('--center_loss', default=True, type=bool, help='use center loss')
+    group.add_argument('--center_loss_lambda', default=0.01, type=float, help='center loss lambda')
+    group.add_argument('--center_loss_alpha', default=0.5, type=float, help='center loss alpha')
 
     parser.set_defaults(func=train_rexnet)
