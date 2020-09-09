@@ -133,7 +133,10 @@ class RexnetTrainingSpec(TrainingSpec):
     def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         if self.center_loss:
             output, feature = model(pixel)
-            centers = model.centers
+            if self.distributed:
+                centers = model.module.centers
+            else:
+                centers = model.centers
 
             loss_nll = self.criterion(output, label)
             loss_center = compute_center_loss(feature, centers, label)
@@ -152,7 +155,10 @@ class RexnetTrainingSpec(TrainingSpec):
     def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         if self.center_loss:
             output, feature = model(pixel)
-            centers = model.centers
+            if self.distributed:
+                centers = model.module.centers
+            else:
+                centers = model.centers
 
             loss_nll = self.criterion(output, label)
             loss_center = compute_center_loss(feature, centers, label)
