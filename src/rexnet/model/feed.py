@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.auto_grad import Variable
+from torch.autograd import Variable
 from math import ceil
 
 from rexnet.model import Swish, SE, LinearBottleneck, _add_conv_swish, _add_conv
