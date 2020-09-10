@@ -18,7 +18,7 @@ class RexnetTrainingSpec(TrainingSpec):
                 train_shuffle: bool, valid_batch_size: int, valid_shuffle: bool, num_workers: int,
                 base_lr: float, lr_min: float, lr_decay: float, warmup_lr_init: float,
                 warmup_t: int, cooldown_epochs: int, momentum: float, nesterov: bool, 
-                epochs: int, save_epochs: int, eval_epochs: int,
+                epochs: int, save_epochs: int, valid_epochs: int,
                 model_save_path: str, checkpoint_path: str,
                 gpus: int, center_loss: bool, center_loss_lambda: float, center_loss_alpha: float):
         self.train_data = train_data
@@ -44,7 +44,7 @@ class RexnetTrainingSpec(TrainingSpec):
 
         self.epochs = epochs
         self.save_epochs = save_epochs
-        self.eval_epochs = eval_epochs
+        self.valid_epochs = valid_epochs
 
         self.model_save_path = model_save_path
         self.checkpoint_path = checkpoint_path
@@ -182,7 +182,7 @@ def train_rexnet(args: argparse.Namespace):
                             num_workers=args.num_workers, base_lr=args.base_lr, lr_min=args.lr_min, lr_decay=args.lr_decay,
                             warmup_lr_init=args.warmup_lr_init, warmup_t=args.warmup_t, cooldown_epochs=args.cooldown_epochs,
                             momentum=args.momentum, nesterov=args.nesterov, 
-                            epochs=args.epochs, save_epochs=args.save_epochs, eval_epochs=args.eval_epochs,
+                            epochs=args.epochs, save_epochs=args.save_epochs, valid_epochs=args.valid_epochs,
                             model_save_path=args.model_save_path, checkpoint_path=args.checkpoint_path,
                             gpus=args.gpus, center_loss=args.center_loss, center_loss_lambda=args.center_loss_lambda,
                             center_loss_alpha=args.center_loss_alpha)
@@ -206,7 +206,7 @@ def add_subparser(subparsers):
     group = parser.add_argument_group('Train Config')
     group.add_argument('--epochs', default=400, type=int, help='num of total epochs')
     group.add_argument('--save_epochs', default=10, type=int, help='interval epohcs of saving')
-    group.add_argument('--eval_epochs', default=1, type=int, help='interval epochs of eval')
+    group.add_argument('--valid_epochs', default=1, type=int, help='interval epochs of valid')
     group.add_argument('--base_lr', default=0.5, type=float, help='base lr value')
     group.add_argument('--lr_min', default=0.00001, type=float, help='minimum value of lr')
     group.add_argument('--lr_decay', default=0.1, type=float, help='lr decay value')

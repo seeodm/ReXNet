@@ -8,7 +8,7 @@ class Recorder(object):
             'loss' : [],
             'accuracy' : [],
         }
-        self.eval_metrics = {
+        self.valid_metrics = {
             'loss' : [],
             'accuracy': [],
         }
@@ -18,5 +18,5 @@ class Recorder(object):
             self.train_metrics['loss'].append((epoch, metrics['loss']))
             self.train_metrics['accuracy'].append((epoch, metrics['accuracy']))
         else:
-            self.eval_metrics['loss'].append((epoch, metrics['loss']))
-            self.eval_metrics['accuracy'].append((epoch, metrics['accuracy']))
+            self.valid_metrics['loss'].append((epoch, metrics['loss']))
+            self.valid_metrics['accuracy'].append((epoch, metrics['accuracy']))

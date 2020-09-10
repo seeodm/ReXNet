@@ -54,11 +54,11 @@ class Trainer(object):
             train_metrics = self._train_step(rank, epoch, model, train_loader, optimizer, t)
             recorder.record(epoch, train_metrics, phase='train')
 
-            if (epoch + 1) % self.spec.eval_epochs:
-                eval_metrics = self._valid_step(rank, epoch, model, valid_loader, optimizer, t)
-                recorder.record(epoch, eval_metrics, phase='eval')
+            if (epoch + 1) % self.spec.valid_epochs == 0:
+                valid_metrics = self._valid_step(rank, epoch, model, valid_loader, optimizer, t)
+                recorder.record(epoch, valid_metrics, phase='valid')
 
-            if rank == 0 and (epoch + 1) % self.spec.save_epochs:
+            if rank == 0 and (epoch + 1) % self.spec.save_epochs == 0:
                 ckpt = {
                     'epoch' : epoch,
                     'recorder' : recorder,
@@ -127,8 +127,8 @@ class Trainer(object):
                     optimizer: optim.Optimizer,
                     t: tqdm.tqdm):
 
-        eval_loss = 0
-        eval_acc = 0
+        valid_loss = 0
+        valid_acc = 0
         total_step = 0
 
         model.eval()
@@ -143,16 +143,16 @@ class Trainer(object):
             output = metrics['output']
 
             # loss update
-            eval_loss += loss.item()
+            valid_loss += loss.item()
 
             # acc update
             _, ind = output.topk(1, 1, True, True)
-            eval_correct = ind.eq(label.view(-1, 1).expand_as(ind))
-            eval_correct_total = eval_correct.view(-1).float().sum()
-            eval_acc += eval_correct_total * (100.0 / pixel.shape[0])
+            valid_correct = ind.eq(label.view(-1, 1).expand_as(ind))
+            valid_correct_total = valid_correct.view(-1).float().sum()
+            valid_acc += valid_correct_total * (100.0 / pixel.shape[0])
 
             # step update
             total_step += 1
 
-        return {'loss' : eval_loss / total_step, 'accuracy' : eval_acc / total_step}
+        return {'loss' : valid_loss / total_step, 'accuracy' : valid_acc / total_step}
 
