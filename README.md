@@ -26,7 +26,7 @@ The detail of command-line is as follows:
                     [--train_shuffle TRAIN_SHUFFLE]
                     [--valid_shuffle VALID_SHUFFLE]
                     [--num_workers NUM_WORKERS] [--epochs EPOCHS]
-                    [--save_epochs SAVE_EPOCHS] [--eval_epochs EVAL_EPOCHS]
+                    [--save_epochs SAVE_EPOCHS] [--valid_epochs VALID_EPOCHS]
                     [--base_lr BASE_LR] [--lr_min LR_MIN]
                     [--lr_decay LR_DECAY] [--warmup_lr_init WARMUP_LR_INIT]
                     [--warmup_t WARMUP_T] [--cooldown_epochs COOLDOWN_EPOCHS]
@@ -62,8 +62,8 @@ The detail of command-line is as follows:
         --epochs EPOCHS       num of total epochs
         --save_epochs SAVE_EPOCHS
                                 interval epohcs of saving
-        --eval_epochs EVAL_EPOCHS
-                                interval epochs of eval
+        --valid_epochs VALID_EPOCHS
+                                interval epochs of valid
         --base_lr BASE_LR     base lr value
         --lr_min LR_MIN       minimum value of lr
         --lr_decay LR_DECAY   lr decay value
