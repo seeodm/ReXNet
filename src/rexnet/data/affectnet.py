@@ -6,16 +6,18 @@ import cv2
 
 import os
 
+
 class AffectNetDataset(Dataset):
     def __init__(self,
                  path: str,
                  transform: transforms,
-                 phase: str='Train'):
+                 phase: str = 'Train'):
 
         self.phase = phase
 
         self.root_path = path
-        self.image_path = os.path.join(self.root_path, 'Manually_Annotated_Images')
+        self.image_path = os.path.join(
+            self.root_path, 'Manually_Annotated_Images')
 
         self.calm = [0]
         self.bright = [1]
@@ -34,8 +36,9 @@ class AffectNetDataset(Dataset):
         if self.phase == 'train':
             csv_file = os.path.join(self.root_path, 'training.csv')
             data = pd.read_csv(csv_file,
-                               names=['dir', 'face_x', 'face_y', 'face_w', 'face_h', 'face_land', 'exp', 'valence', 'arousal'],
-                              skiprows=[0])
+                               names=['dir', 'face_x', 'face_y', 'face_w', 'face_h',
+                                      'face_land', 'exp', 'valence', 'arousal'],
+                               skiprows=[0])
 
         elif self.phase == 'validation':
             csv_file = os.path.join(self.root_path, 'validation.csv')
@@ -57,7 +60,7 @@ class AffectNetDataset(Dataset):
                 img_list.append(d['dir'])
             else:
                 continue
-            
+
         return img_list, anno_list
 
     def __len__(self):

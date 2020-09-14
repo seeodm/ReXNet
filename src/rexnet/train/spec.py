@@ -9,10 +9,11 @@ from rexnet.utils import CosineLRScheduler
 
 from typing import Tuple, Dict, Iterator, Any
 
+
 class TrainingSpec(object):
     def init(self):
         pass
-    
+
     def prepare_transform(self) -> Tuple[transforms.Compose, transforms.Compose]:
         raise NotImplementedError()
 
@@ -23,7 +24,7 @@ class TrainingSpec(object):
         raise NotImplementedError()
 
     def create_optimizer(self, params: Iterator[nn.Parameter]
-                        ) -> optim.Optimizer:
+                         ) -> optim.Optimizer:
         raise NotImplementedError()
 
     def create_scheduler(self, optimizer: optim.Optimizer) -> Tuple[CosineLRScheduler, int]:
@@ -31,6 +32,6 @@ class TrainingSpec(object):
 
     def train_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         raise NotImplementedError()
-       
+
     def valid_objective(self, pixel: torch.Tensor, label: torch.Tensor, model: nn.Module) -> Dict[str, Any]:
         raise NotImplementedError()

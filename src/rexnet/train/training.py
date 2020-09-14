@@ -12,6 +12,7 @@ import tqdm
 
 from typing import Dict, Any
 
+
 class Trainer(object):
     def __init__(self, spec: TrainingSpec):
         self.spec = spec
@@ -23,7 +24,7 @@ class Trainer(object):
             self._train(0)
 
     def _train(self,
-            rank: int):
+               rank: int):
 
         if self.spec.distributed:
             torch.cuda.set_device(rank)
@@ -51,20 +52,22 @@ class Trainer(object):
         t = tqdm.tqdm(total=epochs * len(train_loader))
 
         for epoch in range(epochs):
-            train_metrics = self._train_step(rank, epoch, model, train_loader, optimizer, t)
+            train_metrics = self._train_step(
+                rank, epoch, model, train_loader, optimizer, t)
             recorder.record(epoch, train_metrics, phase='train')
 
             if (epoch + 1) % self.spec.valid_epochs == 0:
-                valid_metrics = self._valid_step(rank, epoch, model, valid_loader, optimizer, t)
+                valid_metrics = self._valid_step(
+                    rank, epoch, model, valid_loader, optimizer, t)
                 recorder.record(epoch, valid_metrics, phase='valid')
 
             if rank == 0 and (epoch + 1) % self.spec.save_epochs == 0:
                 ckpt = {
-                    'epoch' : epoch,
-                    'recorder' : recorder,
-                    'model' : model.state_dict(),
-                    'optimizer' : optimizer.state_dict(),
-                    'scheduler' : scheduler.state_dict(),
+                    'epoch': epoch,
+                    'recorder': recorder,
+                    'model': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'scheduler': scheduler.state_dict(),
                 }
                 torch.save(ckpt, self.spec.checkpoint_path)
 
@@ -74,14 +77,14 @@ class Trainer(object):
         if rank == 0:
             torch.save(model.cpu().state_dict(), self.spec.model_save_path)
 
-    def _train_step(self, 
+    def _train_step(self,
                     rank: int,
                     epochs: int,
                     model: nn.Module,
                     data: DataLoader,
                     optimizer: optim.Optimizer,
                     t: tqdm.tqdm) -> Dict[str, Any]:
-        
+
         train_loss = 0
         train_acc = 0
         total_step = 0
@@ -106,7 +109,7 @@ class Trainer(object):
 
             # loss update
             train_loss += loss.item()
-            
+
             # acc update
             _, ind = output.topk(1, 1, True, True)
             train_correct = ind.eq(label.view(-1, 1).expand_as(ind))
@@ -116,7 +119,7 @@ class Trainer(object):
             # step update
             total_step += 1
 
-        return {'loss' : train_loss / total_step, 'accuracy' : train_acc / total_step}
+        return {'loss': train_loss / total_step, 'accuracy': train_acc / total_step}
 
     @torch.no_grad()
     def _valid_step(self,
@@ -154,5 +157,4 @@ class Trainer(object):
             # step update
             total_step += 1
 
-        return {'loss' : valid_loss / total_step, 'accuracy' : valid_acc / total_step}
-
+        return {'loss': valid_loss / total_step, 'accuracy': valid_acc / total_step}

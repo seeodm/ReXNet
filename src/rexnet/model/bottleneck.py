@@ -3,15 +3,18 @@ import torch.nn as nn
 
 from rexnet.model import _add_conv_swish, _add_conv
 
+
 class SE(nn.Module):
     def __init__(self, in_channels, channels, se_ratio=12):
         super(SE, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-            nn.Conv2d(in_channels, channels // se_ratio, kernel_size=1, padding=0),
+            nn.Conv2d(in_channels, channels // se_ratio,
+                      kernel_size=1, padding=0),
             nn.BatchNorm2d(channels // se_ratio),
             nn.ReLU(inplace=True),
-            nn.Conv2d(channels // se_ratio, channels, kernel_size=1, padding=0),
+            nn.Conv2d(channels // se_ratio, channels,
+                      kernel_size=1, padding=0),
             nn.Sigmoid()
         )
 
@@ -19,6 +22,7 @@ class SE(nn.Module):
         y = self.avg_pool(x)
         y = self.fc(y)
         return x * y
+
 
 class LinearBottleneck(nn.Module):
     def __init__(self, in_channels, channels, t, stride, use_se=True, se_ratio=12,
@@ -43,7 +47,8 @@ class LinearBottleneck(nn.Module):
             out.append(SE(dw_channels, dw_channels, se_ratio))
 
         out.append(nn.ReLU6())
-        _add_conv(out, in_channels=dw_channels, channels=channels, active=False, relu6=True)
+        _add_conv(out, in_channels=dw_channels,
+                  channels=channels, active=False, relu6=True)
         self.out = nn.Sequential(*out)
 
     def forward(self, x):
