@@ -73,6 +73,8 @@ class Trainer(object):
 
                 del ckpt
 
+        if self.spec.distributed:
+            model = model.module
         # Model save
         if rank == 0:
             torch.save(model.cpu().state_dict(), self.spec.model_save_path)
